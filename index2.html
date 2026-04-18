@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Ace - Sales Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.7;
+            color: #1a1a2e;
+            background: #0f0f1a;
+            min-height: 100vh;
+        }
+        .hero {
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 50%, #ff8e53 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .hero .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+        }
+        .hero-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .hero-nav a {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .hero-nav a:hover {
+            background: white;
+            color: #e94560;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #e94560, #ff8e53);
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.3s;
+        }
+        .module {
+            background: #1a1a2e;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .module-header {
+            background: #252542;
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #3a3a5c;
+            transition: background 0.3s;
+        }
+        .module-header:hover {
+            background: #2d2d4a;
+        }
+        .module-header h2 {
+            color: white;
+            font-size: 1.3rem;
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+        .module-header .badge {
+            background: #e94560;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 1rem;
+        }
+        .module-header .badge.completed {
+            background: #10b981;
+        }
+        .module-toggle {
+            color: #888;
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        .module.open .module-toggle {
+            transform: rotate(180deg);
+        }
+        .module-content {
+            display: none;
+            padding: 2rem;
+        }
+        .module.open .module-content {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .info-card {
+            background: #252542;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #e94560;
+        }
+        .info-card h3 {
+            color: #e94560;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .info-card p {
+            color: #c4c4d4;
+            font-size: 0.95rem;
+        }
+        .pitch-box {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .pitch-box h3 {
+            color: white;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .pitch-box p {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95rem;
+        }
+        .pitch-box .example {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+        .objection-card {
+            background: #252542;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .objection-q {
+            padding: 1rem 1.5rem;
+            color: #ff8e53;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .objection-q:hover {
+            background: #2d2d4a;
+        }
+        .objection-a {
+            display: none;
+            padding: 0 1.5rem 1.5rem;
+            color: #c4c4d4;
+        }
+        .objection-card.open .objection-a {
+            display: block;
+        }
+        .scenario-card {
+            background: #252542;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .scenario-card:hover {
+            border-color: #e94560;
+        }
+        .scenario-card .context {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        .scenario-card h4 {
+            color: white;
+            margin-bottom: 0.75rem;
+        }
+        .scenario-card p {
+            color: #c4c4d4;
+            font-size: 0.95rem;
+        }
+        .scenario-card .action {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        .scenario-card .action:hover {
+            background: #ff6b6b;
+        }
+        .quiz-container {
+            background: #252542;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .quiz-question {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .quiz-options {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .quiz-option {
+            background: #1a1a2e;
+            padding: 1rem;
+            border-radius: 8px;
+            color: #c4c4d4;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .quiz-option:hover {
+            border-color: #e94560;
+        }
+        .quiz-option.correct {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .key-point {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #1a1a2e;
+            border-radius: 8px;
+        }
+        .key-point .icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .key-point h4 {
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+        .key-point p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .quick-ref {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .quick-ref-item {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .quick-ref-item .emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .quick-ref-item h5 {
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+        .quick-ref-item p {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #3a3a5c;
+        }
+        .comparison-table th {
+            color: #e94560;
+            font-weight: 600;
+        }
+        .comparison-table td {
+            color: #c4c4d4;
+        }
+        .comparison-table .check { color: #10b981; }
+        .comparison-table .cross { color: #ef4444; }
+        .progress-section {
+            background: #252542;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .progress-section h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+        .stat-item .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e94560;
+        }
+        .stat-item .label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        footer {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .stat-grid { grid-template-columns: 1fr; }
+            .hero-nav { flex-direction: column; }
+            .hero-nav a { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="hero">
+        <h1>Inventory Ace</h1>
+        <p class="subtitle">Sales Training Program</p>
+        <nav class="hero-nav">
+            <a href="#learn">Learn the Product</a>
+            <a href="#pitch">Pitch It</a>
+            <a href="#objections">Handle Objections</a>
+            <a href="#scenarios">Scenarios</a>
+            <a href="#quiz">Test Yourself</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <h3>Your Training Progress</h3>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="number" id="modulesCompleted">0</div>
+                    <div class="label">Modules Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="quizScore">0%</div>
+                    <div class="label">Quiz Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="scenariosCompleted">0</div>
+                    <div class="label">Scenarios Practiced</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE 1: What Is Inventory Ace -->
+        <div class="module" id="module1">
+            <div class="module-header" onclick="toggleModule('module1')">
+                <div style="display: flex; align-items: center;">
+                    <span class="badge" id="badge1">Start</span>
+                    <h2>What Is Inventory Ace?</h2>
+                </div>
+                <span class="module-toggle">▼</span>
+            </div>
+            <div class="module-content">
+                <div class="info-card">
+                    <h3>The One-Line Description</h3>
+                    <p>Inventory Ace is a cloud-based bar inventory management system that replaces spreadsheets and manual tracking with real-time visibility across all your locations.</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>The Problem We Solve</h3>
+                    <p>Bar operators juggle multiple spreadsheets, paper logs, and disconnected POS systems. They don't know their actual stock levels until they're out of something. They catch discrepancies weeks later, if ever. They spend hours on inventory counts that could be automated.</p>
+                </div>
+
+                <div class="pitch-box">
+                    <h3>🎯 How to Pitch This</h3>
+                    <p>Lead with the pain, not the product.</p>
+                    <div class="example">
+                        "How do you currently track inventory across your bars? Most operators we talk to are using spreadsheets — and they're finding out they're out of vodka on a Saturday night. Inventory Ace gives you real-time stock levels across every location, so you're never caught off guard."
+                    </div>
+                </div>
+
+                <h3 style="color: white; margin: 1.5rem 0 1rem;">Key Points to Remember</h3>
+                <div class="key-point">
+                    <span class="icon">☁️</span>
+                    <div>
+                        <h4>Cloud-Based, Not On-Premise</h4>
+                        <p>Access from anywhere. No servers to maintain. Updates happen automatically.</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <span class="icon">📱</span>
+                    <div>
+                        <h4>Mobile-First Design</h4>
+                        <p>Staff can use phones or tablets. Barcode scanning works with any camera.</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <span class="icon">🏢</span>
+                    <div>
+                        <h4>Multi-Venue Ready</h4>
+                        <p>One dashboard to see all locations, or drill down to any single bar.</p>
+                    </div>
+                </div>
+
+                <button class="action" onclick="completeModule('module1')">Mark as Complete</button>
+            </div>
+        </div>
+
+        <!-- MODULE 2: Core Features -->
+        <div class="module" id="module2">
+            <div class="module-header" onclick="toggleModule('module2')">
+                <div style="display: flex; align-items: center;">
+                    <span class="badge" id="badge2">Start</span>
+                    <h2>Core Features & How to Sell Them</h2>
+                </div>
+                <span class="module-toggle">▼</span>
+            </div>
+            <div class="module-content">
+                <div class="info-card">
+                    <h3>Inventory Tracking</h3>
+                    <p>Every product tracked across every location. Par-level alerts tell you when stock is getting low. Cycle counts reconcile physical vs. system inventory.</p>
+                </div>
+                <div class="pitch-box">
+                    <h3>💬 What to Say</h3>
+                    <p>Focus on prevention, not just tracking.</p>
+                    <div class="example">
+                        "Instead of finding out Monday morning that you ran out of lime juice Saturday night, you'll get an alert when you hit your par level. You can reorder before the rush — not after the damage is done."
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Barcode Scanning</h3>
+                    <p>Scan with phone camera or enter codes manually. Quick product lookup during transactions.</p>
+                </div>
+                <div class="pitch-box">
+                    <h3>💬 What to Say</h3>
+                    <p>Remove friction for barbacks.</p>
+                    <div class="example">
+                        "Your barbacks aren't going to search through a list for 'Bacardi Superior' at 11pm on a busy night. They scan the bottle, record the transaction, done. It's faster than paper."
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Transfer System</h3>
+                    <p>Move stock between locations with full tracking: request → ship → receive. Cancellations restore stock automatically.</p>
+                </div>
+                <div class="pitch-box">
+                    <h3>💬 What to Say</h3>
+                    <p>Show the accountability chain.</p>
+                    <div class="example">
+                        "If your main bar needs stock from the back storage, they request a transfer. When storage ships it, stock deducts immediately. When the bar receives it, it appears. No more 'I thought we had more' or missing product with no paper trail."
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>AI Analytics</h3>
+                    <p>Sales velocity, week-over-week trends, busy hour heatmaps, 7-day demand forecasting.</p>
+                </div>
+                <div class="pitch-box">
+                    <h3>💬 What to Say</h3>
+                    <p>Position AI as your competitive advantage.</p>
+                    <div class="example">
+                        "Our AI looks at your transaction history and tells you that you sell 40% more tequila on Friday nights after 9pm. So you know to bump up your par level before the weekend — not guess."
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Staff & Shift Management</h3>
+                    <p>Clock in/out, break tracking, active shift dashboard, labor cost per shift.</p>
+                </div>
+                <div class="pitch-box">
+                    <h3>💬 What to Say</h3>
+                    <p>Connect inventory to accountability.</p>
+                    <div class="example">
+                        "You can see exactly who was working when product went missing. It's not about blaming people — it's about having visibility. When staff know there's a system tracking everything, shrinkage drops."
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Event Management</h3>
+                    <p>Create events, assign staff, track guest counts and budgets, link transactions to specific events.</p>
+                </div>
+                <div class="pitch-box">
+                    <h3>💬 What to Say</h3>
+                    <p>Show event profitability.</p>
+                    <div class="example">
+                        "Corporate event on Friday? Link it in the system. You'll see exactly what product was used, what revenue came in, and the actual profit margin. No more guessing if private events are worth it."
+                    </div>
+                </div>
+
+                <button class="action" onclick="completeModule('module2')">Mark as Complete</button>
+            </div>
+        </div>
+
+        <!-- MODULE 3: Handling Objections -->
+        <div class="module" id="module3">
+            <div class="module-header" onclick="toggleModule('module3')">
+                <div style="display: flex; align-items: center;">
+                    <span class="badge" id="badge3">Start</span>
+                    <h2>Handling Objections</h2>
+                </div>
+                <span class="module-toggle">▼</span>
+            </div>
+            <div class="module-content">
+                <p style="color: #888; margin-bottom: 1.5rem;">Click each objection to reveal the response strategy.</p>
+
+                <div class="objection-card">
+                    <div class="objection-q" onclick="toggleObjection(this)">
+                        "We're already using spreadsheets — they work fine."
+                        <span>+</span>
+                    </div>
+                    <div class="objection-a">
+                        <p><strong>Acknowledge:</strong> "Spreadsheets do work, and many operators are successful with them. The question is: at what cost?"</p>
+                        <p style="margin-top: 0.5rem;"><strong>Then pivot:</strong> "How many hours a week does your team spend updating spreadsheets? How quickly can you see stock levels across all locations right now? With Inventory Ace, it's real-time — and your staff spend that time on service instead."</p>
+                        <p style="margin-top: 0.5rem; color: #10b981;"><strong>Close:</strong> "Would you trade 10 hours a week of manual entry for a system that updates itself?"</p>
+                    </div>
+                </div>
+
+                <div class="objection-card">
+                    <div class="objection-q" onclick="toggleObjection(this)">
+                        "My staff won't use it — they're resistant to new technology."
+                        <span>+</span>
+                    </div>
+                    <div class="objection-a">
+                        <p><strong>Acknowledge:</strong> "Change is hard, especially in bars where routines are established."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Then pivot:</strong> "Inventory Ace is designed for speed, not complexity. Scan a barcode, tap a few buttons, done. It's faster than writing it down. When staff see it saves them time, resistance drops."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Evidence:</strong> "We onboard in under an hour. Your staff will be using it by end of shift."</p>
+                    </div>
+                </div>
+
+                <div class="objection-card">
+                    <div class="objection-q" onclick="toggleObjection(this)">
+                        "We already have a POS system that tracks inventory."
+                        <span>+</span>
+                    </div>
+                    <div class="objection-a">
+                        <p><strong>Acknowledge:</strong> "POS systems do track sales, which affects inventory levels."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Then pivot:</strong> "But POS doesn't track receiving shipments, transfers between locations, comps, spills, or inventory that walks out the back door. Inventory Ace connects all those dots."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Key point:</strong> "POS tells you what sold. We tell you what happened to everything else."</p>
+                    </div>
+                </div>
+
+                <div class="objection-card">
+                    <div class="objection-q" onclick="toggleObjection(this)">
+                        "It's too expensive."
+                        <span>+</span>
+                    </div>
+                    <div class="objection-a">
+                        <p><strong>Acknowledge:</strong> "I understand budget is a consideration."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Then pivot:</strong> "How much product do you think walks out the door unaccounted for each month? Shrinkage averages 2-3% in bars. On a $500K annual inventory, that's $10-15K you're already losing."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Close:</strong> "Inventory Ace costs X per month. You'd need to recover less than 1% of shrinkage to pay for it. What would 2% shrinkage reduction mean to your bottom line?"</p>
+                    </div>
+                </div>
+
+                <div class="objection-card">
+                    <div class="objection-q" onclick="toggleObjection(this)">
+                        "We need something simpler."
+                        <span>+</span>
+                    </div>
+                    <div class="objection-a">
+                        <p><strong>Acknowledge:</strong> "Simple is definitely the goal."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Then pivot:</strong> "Inventory Ace is built for bars, not accountants. The most common tasks — recording transactions, checking stock, scanning barcodes — are designed to take under 10 seconds. You don't need to be tech-savvy."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Demo anchor:</strong> "Let me show you — I'll time myself recording a transaction. Five seconds."</p>
+                    </div>
+                </div>
+
+                <div class="objection-card">
+                    <div class="objection-q" onclick="toggleObjection(this)">
+                        "What if we have multiple bars? Can it handle that?"
+                        <span>+</span>
+                    </div>
+                    <div class="objection-a">
+                        <p><strong>Acknowledge:</strong> "That's actually our strength."</p>
+                        <p style="margin-top: 0.5rem;"><strong>Key points:</strong></p>
+                        <ul style="margin: 0.5rem 0 0.5rem 1.5rem; color: #c4c4d4;">
+                            <li>See all locations in one dashboard</li>
+                            <li>Transfer stock between any locations</li>
+                            <li>Each bar manager sees only their location</li>
+                            <li>Admin sees everything with aggregated reports</li>
+                        </ul>
+                        <p style="margin-top: 0.5rem;"><strong>Close:</strong> "You can manage 2 bars or 20 from the same login."</p>
+                    </div>
+                </div>
+
+                <button class="action" onclick="completeModule('module3')">Mark as Complete</button>
+            </div>
+        </div>
+
+        <!-- MODULE 4: Practice Scenarios -->
+        <div class="module" id="module4">
+            <div class="module-header" onclick="toggleModule('module4')">
+                <div style="display: flex; align-items: center;">
+                    <span class="badge" id="badge4">Start</span>
+                    <h2>Practice Scenarios</h2>
+                </div>
+                <span class="module-toggle">▼</span>
+            </div>
+            <div class="module-content">
+                <p style="color: #888; margin-bottom: 1.5rem;">Practice your pitch in these common sales situations.</p>
+
+                <div class="scenario-card">
+                    <div class="context">Scenario 1 of 4 — Single Bar Owner</div>
+                    <h4>The Skeptical Solo Operator</h4>
+                    <p>You meet a bar owner who runs a single 6-bar pub. He's been in business 15 years, does inventory once a month with pen and paper. He says his system works and doesn't see the point of changing.</p>
+                    <button class="action" onclick="showScenarioAnswer(1)">Show Suggested Approach</button>
+                    <div id="scenario1" style="display: none; margin-top: 1rem; padding: 1rem; background: #1a1a2e; border-radius: 8px;">
+                        <p style="color: #c4c4d4;"><strong>Approach:</strong> Don't sell features. Sell time and peace of mind.</p>
+                        <p style="color: #c4c4d4; margin-top: 0.5rem;"><strong>Key points:</strong></p>
+                        <ul style="margin: 0.5rem 0 0.5rem 1.5rem; color: #888;">
+                            <li>15 years of experience is valuable — respect it</li>
+                            <li>Ask: "What happens when you're out of something unexpected?"</li>
+                            <li>Offer a free trial so he can see with his own data</li>
+                            <li>Focus on the monthly count: "What if you never had to do that count manually again?"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="scenario-card">
+                    <div class="context">Scenario 2 of 4 — Multi-Venue Manager</div>
+                    <h4>The Overwhelmed Multi-Venue Manager</h4>
+                    <p>You talk to someone managing 3 bars. They have different managers at each location who all do things differently. Corporate has no visibility into what's actually happening. They're always firefighting.</p>
+                    <button class="action" onclick="showScenarioAnswer(2)">Show Suggested Approach</button>
+                    <div id="scenario2" style="display: none; margin-top: 1rem; padding: 1rem; background: #1a1a2e; border-radius: 8px;">
+                        <p style="color: #c4c4d4;"><strong>Approach:</strong> Sell centralized control and accountability.</p>
+                        <p style="color: #c4c4d4; margin-top: 0.5rem;"><strong>Key points:</strong></p>
+                        <ul style="margin: 0.5rem 0 0.5rem 1.5rem; color: #888;">
+                            <li>One dashboard for all 3 locations</li>
+                            <li>Each manager has their own login and responsibilities</li>
+                            <li>Corporate sees aggregated AND per-location data</li>
+                            <li>Transfers between locations are tracked automatically</li>
+                            <li>Alerts go to the right manager AND corporate</li>
+                        </ul>
+                        <p style="color: #10b981; margin-top: 0.5rem;"><strong>Demo tip:</strong> Show the multi-venue dashboard view first.</p>
+                    </div>
+                </div>
+
+                <div class="scenario-card">
+                    <div class="context">Scenario 3 of 4 — High-Volume Nightclub</div>
+                    <h4>The High-Volume Club Owner</h4>
+                    <p>Club owner with 500+ capacity. Says they already do POS integrated inventory and that's sufficient. High volume, fast pace, staff turn over frequently.</p>
+                    <button class="action" onclick="showScenarioAnswer(3)">Show Suggested Approach</button>
+                    <div id="scenario3" style="display: none; margin-top: 1rem; padding: 1rem; background: #1a1a2e; border-radius: 8px;">
+                        <p style="color: #c4c4d4;"><strong>Approach:</strong> Sell shrinkage control and staff accountability.</p>
+                        <p style="color: #c4c4d4; margin-top: 0.5rem;"><strong>Key points:</strong></p>
+                        <ul style="margin: 0.5rem 0 0.5rem 1.5rem; color: #888;">
+                            <li>High volume = high shrinkage risk</li>
+                            <li>POS only tracks what scanned through register</li>
+                            <li>What about product given away? Spills not recorded? Back door losses?</li>
+                            <li>Barcode scan takes 3 seconds — works at speed</li>
+                            <li>Link transactions to staff — accountability reduces shrinkage</li>
+                        </ul>
+                        <p style="color: #10b981; margin-top: 0.5rem;"><strong>Stat to mention:</strong> Bars lose 2-4% of inventory to shrinkage. On $2M inventory, that's $40-80K.</p>
+                    </div>
+                </div>
+
+                <div class="scenario-card">
+                    <div class="context">Scenario 4 of 4 — Event Venue</div>
+                    <h4>The Event Venue Coordinator</h4>
+                    <p>Wedding and corporate event venue with a built-in bar. Events are booked months out but they never know exact staffing needs or how much product to stock. Want to understand event profitability.</p>
+                    <button class="action" onclick="showScenarioAnswer(4)">Show Suggested Approach</button>
+                    <div id="scenario4" style="display: none; margin-top: 1rem; padding: 1rem; background: #1a1a2e; border-radius: 8px;">
+                        <p style="color: #c4c4d4;"><strong>Approach:</strong> Sell event profitability tracking.</p>
+                        <p style="color: #c4c4d4; margin-top: 0.5rem;"><strong>Key points:</strong></p>
+                        <ul style="margin: 0.5rem 0 0.5rem 1.5rem; color: #888;">
+                            <li>Create event in system with expected guest count and budget</li>
+                            <li>Assign staff to the event</li>
+                            <li>Link all bar transactions to the event</li>
+                            <li>After event: see revenue vs. product used vs. labor cost</li>
+                            <li>Know exactly what to stock for next similar event</li>
+                        </ul>
+                        <p style="color: #10b981; margin-top: 0.5rem;"><strong>Key message:</strong> "Stop guessing if events are profitable. Know it."</p>
+                    </div>
+                </div>
+
+                <button class="action" onclick="completeModule('module4')">Mark as Complete</button>
+            </div>
+        </div>
+
+        <!-- MODULE 5: Quiz -->
+        <div class="module" id="module5">
+            <div class="module-header" onclick="toggleModule('module5')">
+                <div style="display: flex; align-items: center;">
+                    <span class="badge" id="badge5">Start</span>
+                    <h2>Knowledge Check</h2>
+                </div>
+                <span class="module-toggle">▼</span>
+            </div>
+            <div class="module-content">
+                <p style="color: #888; margin-bottom: 1.5rem;">Test your knowledge. Select the best answer for each question.</p>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">Q1: What is the main pain point Inventory Ace solves?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">A) Slow internet connectivity</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, true)">B) Lack of real-time inventory visibility</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">C) Too many barcode scanners</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">D) Expensive liquor licenses</div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">Q2: When should par-level alerts be triggered?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">A) Only when completely out of stock</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">B) Once a month during manual counts</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, true)">C) When stock reaches a predefined threshold</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only for premium spirits</div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">Q3: What makes Inventory Ace different from POS-only inventory tracking?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">A) It's more expensive</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, true)">B) It tracks spills, comps, transfers, and shrinkage POS systems miss</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">C) It requires more training</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's only for nightclubs</div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">Q4: How does the transfer workflow help prevent inventory discrepancies?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">A) It doesn't — transfers are manual</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">B) It emails the manager</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, true)">C) Stock deducts at ship and adds at receive, with full audit trail</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">D) It only works between bars in the same venue</div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">Q5: What is the best response to "We're already using spreadsheets"?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">A) "Spreadsheets don't work."</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">B) "You should switch immediately."</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, true)">C) "Spreadsheets work, but at what cost? How many hours weekly?"</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">D) "OK, here's our brochure."</div>
+                    </div>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-question">Q6: For a multi-venue operator, what's the key selling point?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">A) Lower per-bar costs</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, true)">B) Centralized visibility with local control</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">C) Free barcode scanners</div>
+                        <div class="quiz-option" onclick="checkAnswer(this, false)">D) Automatic pricing updates</div>
+                    </div>
+                </div>
+
+                <button class="action" onclick="calculateQuizScore()" style="background: #10b981;">Calculate My Score</button>
+                <div id="quizResult" style="display: none; margin-top: 1rem; padding: 1.5rem; background: #252542; border-radius: 12px; text-align: center;">
+                    <h3 style="color: white; margin-bottom: 0.5rem;" id="quizResultTitle"></h3>
+                    <p style="color: #c4c4d4;" id="quizResultText"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE 6: Quick Reference -->
+        <div class="module" id="module6">
+            <div class="module-header" onclick="toggleModule('module6')">
+                <div style="display: flex; align-items: center;">
+                    <span class="badge" id="badge6">Start</span>
+                    <h2>Quick Reference Cards</h2>
+                </div>
+                <span class="module-toggle">▼</span>
+            </div>
+            <div class="module-content">
+                <p style="color: #888; margin-bottom: 1.5rem;">Use these cards to quickly recall key selling points and demo highlights.</p>
+
+                <div class="info-card" style="border-left-color: #10b981;">
+                    <h3>🎯 The One-Minute Elevator Pitch</h3>
+                    <p style="font-size: 1rem; line-height: 1.8;">
+                        "Inventory Ace is bar inventory management that gives you real-time visibility across every location. Instead of finding out you're out of product on a busy night, you get alerts when stock hits your par levels. It tracks everything — sales, transfers, spills, comps — with barcode scanning and AI-powered insights that tell you what's selling and when. One dashboard, every bar, complete visibility."
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <h3>💰 ROI Talking Points</h3>
+                    <ul style="margin: 0.5rem 0 0.5rem 1.5rem; color: #c4c4d4;">
+                        <li>Bars lose 2-4% of inventory to shrinkage annually</li>
+                        <li>Most operators spend 5-10 hours/week on manual inventory</li>
+                        <li>Each par-level alert prevented = ~$200-500 in avoided lost sales</li>
+                        <li>Staff accountability alone typically reduces shrinkage by 30-50%</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>⚡ Demo Highlights (Show These First)</h3>
+                    <div class="quick-ref">
+                        <div class="quick-ref-item">
+                            <div class="emoji">📊</div>
+                            <h5>Dashboard</h5>
+                            <p>One view of all locations</p>
+                        </div>
+                        <div class="quick-ref-item">
+                            <div class="emoji">📱</div>
+                            <h5>Barcode Scan</h5>
+                            <p>3-second transaction entry</p>
+                        </div>
+                        <div class="quick-ref-item">
+                            <div class="emoji">🔔</div>
+                            <h5>Par Alerts</h5>
+                            <p>Low stock notifications</p>
+                        </div>
+                        <div class="quick-ref-item">
+                            <div class="emoji">📈</div>
+                            <h5>AI Insights</h5>
+                            <p>Trending & forecasts</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>🏆 Competitive Advantages</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Inventory Ace</th>
+                                <th>Spreadsheets</th>
+                                <th>POS-Only</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Real-time stock levels</td>
+                                <td class="check">✓</td>
+                                <td class="cross">✗</td>
+                                <td class="cross">✗</td>
+                            </tr>
+                            <tr>
+                                <td>Multi-location tracking</td>
+                                <td class="check">✓</td>
+                                <td class="cross">✗</td>
+                                <td class="cross">✗</td>
+                            </tr>
+                            <tr>
+                                <td>Transfer workflow</td>
+                                <td class="check">✓</td>
+                                <td class="cross">✗</td>
+                                <td class="cross">✗</td>
+                            </tr>
+                            <tr>
+                                <td>AI analytics</td>
+                                <td class="check">✓</td>
+                                <td class="cross">✗</td>
+                                <td class="cross">✗</td>
+                            </tr>
+                            <tr>
+                                <td>Cycle count reconciliation</td>
+                                <td class="check">✓</td>
+                                <td class="check">✓</td>
+                                <td class="cross">✗</td>
+                            </tr>
+                            <tr>
+                                <td>Staff accountability</td>
+                                <td class="check">✓</td>
+                                <td class="cross">✗</td>
+                                <td class="check">✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="action" onclick="completeModule('module6')">Mark as Complete</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Inventory Ace Sales Training</p>
+            <p style="margin-top: 0.5rem;">Built for Real Bar Operations</p>
+        </footer>
+    </div>
+
+    <script>
+        let completedModules = new Set();
+        let scenariosPracticed = 0;
+        let quizAnswers = {};
+
+        function toggleModule(id) {
+            const module = document.getElementById(id);
+            module.classList.toggle('open');
+        }
+
+        function completeModule(id) {
+            const module = document.getElementById(id);
+            const badge = document.getElementById(id.replace('module', 'badge'));
+            module.classList.add('open');
+            completedModules.add(id);
+            badge.textContent = 'Completed';
+            badge.classList.add('completed');
+            updateProgress();
+        }
+
+        function toggleObjection(element) {
+            const card = element.parentElement;
+            const span = element.querySelector('span');
+            const isOpen = card.classList.contains('open');
+
+            // Close all others
+            document.querySelectorAll('.objection-card').forEach(c => {
+                c.classList.remove('open');
+                c.querySelector('.objection-q span').textContent = '+';
+            });
+
+            if (!isOpen) {
+                card.classList.add('open');
+                span.textContent = '−';
+            }
+        }
+
+        function showScenarioAnswer(num) {
+            const scenario = document.getElementById('scenario' + num);
+            if (scenario.style.display === 'none') {
+                scenario.style.display = 'block';
+                scenariosPracticed++;
+                updateProgress();
+            } else {
+                scenario.style.display = 'none';
+            }
+        }
+
+        function checkAnswer(element, correct) {
+            const container = element.parentElement;
+            const options = container.querySelectorAll('.quiz-option');
+
+            // Reset all options
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+                opt.style.pointerEvents = 'none';
+            });
+
+            // Mark selected
+            if (correct) {
+                element.classList.add('correct');
+                quizAnswers[container.querySelector('.quiz-question').textContent] = true;
+            } else {
+                element.classList.add('incorrect');
+                // Show correct answer
+                options.forEach(opt => {
+                    if (opt.onclick.toString().includes('true')) {
+                        opt.classList.add('correct');
+                    }
+                });
+                quizAnswers[container.querySelector('.quiz-question').textContent] = false;
+            }
+        }
+
+        function calculateQuizScore() {
+            const total = Object.keys(quizAnswers).length;
+            const correct = Object.values(quizAnswers).filter(v => v).length;
+            const score = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+            const resultDiv = document.getElementById('quizResult');
+            const resultTitle = document.getElementById('quizResultTitle');
+            const resultText = document.getElementById('quizResultText');
+
+            resultDiv.style.display = 'block';
+            document.getElementById('quizScore').textContent = score + '%';
+
+            if (score >= 80) {
+                resultTitle.textContent = '🎉 Excellent!';
+                resultText.textContent = 'You\'re ready to sell Inventory Ace!';
+            } else if (score >= 60) {
+                resultTitle.textContent = '👍 Good Progress';
+                resultText.textContent = 'Review the modules you missed and try again.';
+            } else {
+                resultTitle.textContent = '📚 Keep Learning';
+                resultText.textContent = 'Go through the modules again to build confidence.';
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('modulesCompleted').textContent = completedModules.size;
+            document.getElementById('scenariosCompleted').textContent = scenariosPracticed;
+
+            const totalModules = 6;
+            const progress = (completedModules.size / totalModules) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('.hero-nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setTimeout(() => toggleModule(targetId), 500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
