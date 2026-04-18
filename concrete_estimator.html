@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concrete Service Estimator - Volusia County</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .label-with-tooltip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tooltip-icon {
+            width: 18px;
+            height: 18px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip-icon:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 0;
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: normal;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #e74c3c;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.2);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .checkbox-group,
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #e74c3c;
+        }
+
+        .checkbox-item label,
+        .radio-item label {
+            margin-bottom: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 14px 24px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-reset {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-preset {
+            background: #3498db;
+            color: white;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-preset:hover {
+            background: #2980b9;
+        }
+
+        .preset-buttons {
+            margin-bottom: 20px;
+        }
+
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .estimate-box {
+            background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .estimate-header {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .cost-range {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .cost-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border-top: 3px solid #e74c3c;
+        }
+
+        .cost-label {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .cost-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+
+        .breakdown-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .breakdown-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .breakdown-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .tools-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .tool-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tool-name {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .tool-price {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #856404;
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+
+        .print-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-print {
+            background: #27ae60;
+            color: white;
+            padding: 12px 30px;
+        }
+
+        .btn-print:hover {
+            background: #229954;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .summary-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .summary-table td:first-child {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .summary-table td:last-child {
+            text-align: right;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 6px;
+            color: #155724;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .card:first-child {
+                display: none;
+            }
+
+            .button-group {
+                display: none;
+            }
+
+            .print-section {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Concrete Service Estimator</h1>
+            <p>Professional Estimates for Volusia County, Florida | 2025–2026</p>
+        </div>
+
+        <!-- Input Form Card -->
+        <div class="card">
+            <div class="card-title">Project Details</div>
+
+            <div class="preset-buttons">
+                <button class="btn-preset" onclick="loadPreset('driveway')">400 sq ft Basic Driveway</button>
+                <button class="btn-preset" onclick="loadPreset('patio')">300 sq ft Mid-Range Patio</button>
+                <button class="btn-preset" onclick="loadPreset('pool')">500 sq ft Pool Deck</button>
+            </div>
+
+            <!-- Project Type -->
+            <div class="form-group">
+                <label class="label-with-tooltip">
+                    Project Type
+                    <span class="tooltip-icon" data-tooltip="Select the primary concrete work type">?</span>
+                </label>
+                <select id="projectType" onchange="updateProjectType()">
+                    <option value="driveway">Driveway</option>
+                    <option value="patio">Patio</option>
+                    <option value="sidewalk">Sidewalk / Walkway</option>
+                    <option value="slab">Concrete Slab (Garage/Shed)</option>
+                    <option value="pool">Pool Deck</option>
+                    <option value="resurfacing">Resurfacing / Overlay</option>
+                </select>
+            </div>
+
+            <!-- Dimensions -->
+            <div class="form-group">
+                <label class="label-with-tooltip">
+                    Project Area
+                    <span class="tooltip-icon" data-tooltip="Enter length × width or total square footage">?</span>
+                </label>
+                <div class="input-row">
+                    <input type="number" id="length" placeholder="Length (ft)" min="1" onchange="calculateArea()">
+                    <input type="number" id="width" placeholder="Width (ft)" min="1" onchange="calculateArea()">
+                </div>
+                <input type="number" id="squareFeet" placeholder="Or enter total sq ft" min="1" style="margin-top: 10px;" onchange="syncArea()">
+            </div>
+
+            <!-- Finish Level -->
+            <div class="form-group">
+                <label class="label-with-tooltip">
+                    Finish Level
+                    <span class="tooltip-icon" data-tooltip="Basic = broom finish. Mid = trowel/smooth. Premium = stamped/decorative">?</span>
+                </label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="basic" name="finish" value="basic" checked>
+                        <label for="basic">Basic (Broom Finish)</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="midrange" name="finish" value="midrange">
+                        <label for="midrange">Mid-Range (Trowel Finish)</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="premium" name="finish" value="premium">
+                        <label for="premium">Premium (Stamped/Decorative)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add-ons -->
+            <div class="form-group">
+                <label class="label-with-tooltip">
+                    Add-On Features
+                    <span class="tooltip-icon" data-tooltip="Select any additional finishes or treatments">?</span>
+                </label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="stamped" name="addons" value="stamped">
+                        <label for="stamped">Stamped Pattern (+$4–10/sq ft)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="colored" name="addons" value="colored">
+                        <label for="colored">Colored Concrete (+$4–10/sq ft)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="exposed" name="addons" value="exposed">
+                        <label for="exposed">Exposed Aggregate (+$4–10/sq ft)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="sealing" name="addons" value="sealing">
+                        <label for="sealing">Sealing Treatment (+$200–$400)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Material Option -->
+            <div class="form-group">
+                <label class="label-with-tooltip">
+                    Material Sourcing
+                    <span class="tooltip-icon" data-tooltip="Bagged mix for small/DIY projects. Ready-mix for larger pours">?</span>
+                </label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="bagged" name="material" value="bagged" checked>
+                        <label for="bagged">Bagged Mix (DIY/Small Projects)</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="readymix" name="material" value="readymix">
+                        <label for="readymix">Ready-Mix Delivery (Professional Pour)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thickness (for material calc) -->
+            <div class="form-group">
+                <label class="label-with-tooltip">
+                    Slab Thickness
+                    <span class="tooltip-icon" data-tooltip="Standard: 4-6 inches. Affects material quantity">?</span>
+                </label>
+                <select id="thickness">
+                    <option value="4">4 inches (Standard Driveway)</option>
+                    <option value="5">5 inches (Heavy Use)</option>
+                    <option value="6">6 inches (Very Heavy Use)</option>
+                </select>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button class="btn-calculate" onclick="generateEstimate()">Generate Estimate</button>
+                <button class="btn-reset" onclick="resetForm()">Clear All</button>
+            </div>
+        </div>
+
+        <!-- Output Card -->
+        <div class="card">
+            <div class="card-title">Estimate Output</div>
+            <div id="outputContainer" class="output-section hidden">
+                <div class="success-message">Estimate generated successfully. Review details below.</div>
+
+                <!-- Cost Range -->
+                <div class="estimate-box">
+                    <div class="estimate-header">Project Cost Range</div>
+                    <div class="cost-range">
+                        <div class="cost-item">
+                            <div class="cost-label">Low</div>
+                            <div class="cost-value" id="lowCost">—</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-label">Mid</div>
+                            <div class="cost-value" id="midCost">—</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-label">High</div>
+                            <div class="cost-value" id="highCost">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Summary -->
+                <div class="breakdown-section">
+                    <div class="breakdown-title">Project Summary</div>
+                    <table class="summary-table">
+                        <tr>
+                            <td>Project Type:</td>
+                            <td id="summaryType">—</td>
+                        </tr>
+                        <tr>
+                            <td>Square Footage:</td>
+                            <td id="summarySqFt">—</td>
+                        </tr>
+                        <tr>
+                            <td>Finish Level:</td>
+                            <td id="summaryFinish">—</td>
+                        </tr>
+                        <tr>
+                            <td>Add-On Features:</td>
+                            <td id="summaryAddOns">—</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Material Breakdown -->
+                <div class="breakdown-section">
+                    <div class="breakdown-title">Material Estimate</div>
+                    <div id="materialBreakdown"></div>
+                </div>
+
+                <!-- Labor & Overhead -->
+                <div class="breakdown-section">
+                    <div class="breakdown-title">Labor & Overhead</div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Estimated Labor Cost (Mid-Range):</span>
+                        <span class="breakdown-value" id="laborCost">—</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Est. Overhead & Profit (Mid-Range):</span>
+                        <span class="breakdown-value" id="overheadCost">—</span>
+                    </div>
+                </div>
+
+                <!-- Recommended Tools -->
+                <div class="breakdown-section">
+                    <div class="breakdown-title">Recommended Tools & Accessories</div>
+                    <div id="toolsRecommendation" class="tools-list"></div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="disclaimer">
+                    <strong>Important Disclaimer:</strong><br>
+                    This estimate is based on average Volusia County pricing for 2025–2026. Actual costs may vary based on site conditions, local labor availability, material sourcing, and market fluctuations. A professional site visit is strongly recommended for a firm, binding quote. Material prices are subject to change based on supplier availability. Coastal factors (wind, flood risk, sandy soil) may affect final pricing.
+                </div>
+
+                <!-- Print Button -->
+                <div class="print-section">
+                    <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+                </div>
+            </div>
+
+            <div id="placeholderMessage" style="text-align: center; color: #95a5a6; padding: 40px 20px;">
+                <p style="font-size: 1.1em; margin-bottom: 10px;">👷</p>
+                <p>Fill in project details on the left and click "Generate Estimate" to see detailed pricing and material recommendations here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Tables
+        const pricingMatrix = {
+            driveway: { basic: [6, 10], midrange: [10, 14], premium: [14, 20] },
+            patio: { basic: [8, 10], midrange: [10, 15], premium: [12, 20] },
+            sidewalk: { basic: [6, 11], midrange: [8, 12], premium: [10, 15] },
+            slab: { basic: [6, 12], midrange: [10, 14], premium: [12, 18] },
+            pool: { basic: [8, 12], midrange: [10, 15], premium: [12, 18] },
+            resurfacing: { basic: [3, 6], midrange: [5, 10], premium: [8, 12] }
+        };
+
+        const materialCatalog = {
+            bags80: { name: '80 lb. Concrete Mix (Quikrete)', price: 6.98 },
+            bags60: { name: '60 lb. Concrete Mix (Quikrete)', price: 5.24 },
+            bags50Fast: { name: '50 lb. Fast-Setting Mix', price: 7.97 },
+            bags50Crack: { name: '50 lb. Crack Resistant Mix', price: 5.97 },
+            bags80Sakrete: { name: '80 lb. Gray Mix (SAKRETE)', price: 6.98 },
+            bags60Sakrete: { name: '60 lb. Gray Mix (SAKRETE)', price: 5.24 },
+            remesh: { name: '42x84 Remesh Sheet', price: 16.57 },
+            form8: { name: '8x48 Concrete Form Tube', price: 11.28 },
+            form12: { name: '12x48 QUIK-TUBE', price: 16.28 },
+            mixingTub: { name: 'Black Large Concrete Mixing Tub', price: 16.97 },
+            mixer5: { name: '5.0 cu ft Portable Concrete Mixer (RYOBI)', price: 349.00 },
+            mixer16: { name: '1.6 cu ft Concrete Mixer (YARDMAX)', price: 199.51 },
+            mover: { name: 'Concrete Mover (Razor-Back)', price: 47.06 },
+            patchCompound: { name: '1 Qt. Concrete Patching Compound', price: 10.97 },
+            crackSealant: { name: '1 Qt. Concrete Crack Sealant', price: 13.97 }
+        };
+
+        const toolRecommendations = {
+            driveway: ['mixingTub', 'mover', 'bags80', 'remesh'],
+            patio: ['mixingTub', 'mover', 'bags80', 'remesh'],
+            sidewalk: ['mixingTub', 'bags60', 'form8'],
+            slab: ['mixingTub', 'mover', 'bags80', 'remesh'],
+            pool: ['mixer5', 'mover', 'bags80', 'remesh'],
+            resurfacing: ['patchCompound', 'crackSealant', 'bags50Fast']
+        };
+
+        // Load Preset Data
+        function loadPreset(type) {
+            resetForm();
+            document.getElementById('projectType').value = type;
+
+            if (type === 'driveway') {
+                document.getElementById('length').value = 20;
+                document.getElementById('width').value = 20;
+                document.getElementById('basic').checked = true;
+            } else if (type === 'patio') {
+                document.getElementById('length').value = 20;
+                document.getElementById('width').value = 15;
+                document.getElementById('midrange').checked = true;
+            } else if (type === 'pool') {
+                document.getElementById('length').value = 25;
+                document.getElementById('width').value = 20;
+                document.getElementById('midrange').checked = true;
+            }
+
+            calculateArea();
+        }
+
+        // Area Calculation
+        function calculateArea() {
+            const length = parseFloat(document.getElementById('length').value) || 0;
+            const width = parseFloat(document.getElementById('width').value) || 0;
+            const calculated = length * width;
+            if (calculated > 0) {
+                document.getElementById('squareFeet').value = calculated;
+            }
+        }
+
+        function syncArea() {
+            const sqFt = parseFloat(document.getElementById('squareFeet').value) || 0;
+            if (sqFt > 0) {
+                document.getElementById('length').value = '';
+                document.getElementById('width').value = '';
+            }
+        }
+
+        // Format Currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        }
+
+        // Generate Estimate
+        function generateEstimate() {
+            const projectType = document.getElementById('projectType').value;
+            let squareFeet = parseFloat(document.getElementById('squareFeet').value);
+
+            if (!squareFeet || squareFeet <= 0) {
+                alert('Please enter a valid square footage.');
+                return;
+            }
+
+            const finish = document.querySelector('input[name="finish"]:checked').value;
+            const material = document.querySelector('input[name="material"]:checked').value;
+            const thickness = parseInt(document.getElementById('thickness').value);
+
+            // Get base pricing
+            const priceRange = pricingMatrix[projectType][finish];
+            let baseLow = priceRange[0];
+            let baseHigh = priceRange[1];
+
+            // Apply add-on premiums
+            let addOnPremium = 0;
+            const addOns = Array.from(document.querySelectorAll('input[name="addons"]:checked'))
+                .map(cb => cb.value);
+
+            if (addOns.length > 0) {
+                // Each addon adds $4-10 per sq ft
+                addOnPremium = 4 * addOns.length; // Low estimate
+                baseLow += addOnPremium;
+                baseHigh += addOnPremium;
+            }
+
+            // Add sealing cost flat if checked
+            let sealingCost = 0;
+            if (document.getElementById('sealing').checked) {
+                sealingCost = 300; // Mid-point of $200-400
+            }
+
+            // Calculate costs
+            const costLow = (baseLow * squareFeet) + sealingCost;
+            const costHigh = (baseHigh * squareFeet) + sealingCost;
+            const costMid = (costLow + costHigh) / 2;
+
+            // Material calculation
+            let materialCost = 0;
+            let materialBreakdown = '';
+
+            if (material === 'bagged') {
+                // Calculate bags needed
+                // 1 x 80lb bag ≈ 0.6 cu ft, yields ~0.45-0.5 sq ft at 4" thickness
+                const bagsPerSqFt = (thickness / 12) / 0.6; // Adjusted for thickness
+                const bagsNeeded = Math.ceil(squareFeet * bagsPerSqFt * 1.1); // +10% waste
+                const bagPrice = 6.98; // Average of options
+                materialCost = bagsNeeded * bagPrice;
+
+                materialBreakdown = `
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Estimated Bags (80 lb):</span>
+                        <span class="breakdown-value">${bagsNeeded} bags</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Bag Cost @ $6.98 ea:</span>
+                        <span class="breakdown-value">${formatCurrency(materialCost)}</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Estimated Cubic Yards:</span>
+                        <span class="breakdown-value">${(squareFeet * (thickness / 12) / 27).toFixed(2)} cu yd</span>
+                    </div>
+                `;
+            } else {
+                // Ready-mix calculation
+                const cuYards = squareFeet * (thickness / 12) / 27;
+                const readyMixPrice = 145; // Mid-point of $125-170
+                materialCost = cuYards * readyMixPrice;
+
+                materialBreakdown = `
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Calculated Cubic Yards:</span>
+                        <span class="breakdown-value">${cuYards.toFixed(2)} cu yd</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Ready-Mix Cost @ $145/cu yd:</span>
+                        <span class="breakdown-value">${formatCurrency(materialCost)}</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Delivery (est. 10-yard truck):</span>
+                        <span class="breakdown-value">Included above</span>
+                    </div>
+                `;
+            }
+
+            // Labor & overhead (typically 40-60% of total for mid-range)
+            const laborCost = (costMid * 0.45) - (materialCost * 0.5);
+            const overheadProfit = costMid - materialCost - laborCost;
+
+            // Generate tools list
+            const toolKeys = toolRecommendations[projectType] || [];
+            let toolsHTML = '';
+            toolKeys.forEach(key => {
+                if (materialCatalog[key]) {
+                    const tool = materialCatalog[key];
+                    toolsHTML += `<div class="tool-item"><span class="tool-name">${tool.name}</span><span class="tool-price">${formatCurrency(tool.price)}</span></div>`;
+                }
+            });
+
+            // Populate output
+            document.getElementById('lowCost').textContent = formatCurrency(costLow);
+            document.getElementById('midCost').textContent = formatCurrency(costMid);
+            document.getElementById('highCost').textContent = formatCurrency(costHigh);
+
+            document.getElementById('summaryType').textContent = projectType.charAt(0).toUpperCase() + projectType.slice(1);
+            document.getElementById('summarySqFt').textContent = squareFeet.toFixed(0) + ' sq ft';
+            document.getElementById('summaryFinish').textContent = finish.charAt(0).toUpperCase() + finish.slice(1);
+            document.getElementById('summaryAddOns').textContent = addOns.length > 0 ? addOns.join(', ') : 'None';
+
+            document.getElementById('materialBreakdown').innerHTML = materialBreakdown;
+            document.getElementById('laborCost').textContent = formatCurrency(Math.max(0, laborCost));
+            document.getElementById('overheadCost').textContent = formatCurrency(Math.max(0, overheadProfit));
+            document.getElementById('toolsRecommendation').innerHTML = toolsHTML || '<p style="color: #95a5a6;">No specific tools recommended for this project.</p>';
+
+            // Show output
+            document.getElementById('outputContainer').classList.remove('hidden');
+            document.getElementById('placeholderMessage').style.display = 'none';
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('projectType').value = 'driveway';
+            document.getElementById('length').value = '';
+            document.getElementById('width').value = '';
+            document.getElementById('squareFeet').value = '';
+            document.getElementById('basic').checked = true;
+            document.querySelectorAll('input[name="addons"]').forEach(cb => cb.checked = false);
+            document.getElementById('bagged').checked = true;
+            document.getElementById('thickness').value = '4';
+            document.getElementById('outputContainer').classList.add('hidden');
+            document.getElementById('placeholderMessage').style.display = 'block';
+        }
+
+        // Update Project Type
+        function updateProjectType() {
+            // Can add project-specific logic here if needed
+        }
+    </script>
+</body>
+</html>
